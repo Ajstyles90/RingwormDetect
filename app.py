@@ -128,7 +128,7 @@ def start_flask():
 if __name__ == "__main__":
 
     if webview is not None:
-        # Desktop application
+
         flask_thread = threading.Thread(
             target=start_flask,
             daemon=True
@@ -147,7 +147,7 @@ if __name__ == "__main__":
         webview.start()
 
     else:
-        # Render / web server
+
         app.run(
             host="0.0.0.0",
             port=int(os.environ.get("PORT", 5000)),

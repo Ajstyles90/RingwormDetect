@@ -1,85 +1,108 @@
 import os
 import cv2
+import gc
 import torch
 from ultralytics import YOLO
 
-# Keep PyTorch from creating too many CPU threads on Render
-torch.set_num_threads(1)
-
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODEL_PATH = os.path.join(BASE_DIR, "model", "best.pt")
 RESULTS_DIR = os.path.join(BASE_DIR, "static", "results")
 
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
-# Load model once
-try:
-    model = YOLO(MODEL_PATH)
-    model.to("cpu")
-    load_exception = None
-except Exception as error:
-    model = None
-    load_exception = error
+model = None
+load_exception = None
+
+
+def get_model():
+    global model, load_exception
+
+    if model is None:
+        try:
+            print(f"Loading YOLO model from: {MODEL_PATH}")
+
+            if not os.path.exists(MODEL_PATH):
+                raise FileNotFoundError(
+                    f"Model not found: {MODEL_PATH}"
+                )
+
+            model = YOLO(MODEL_PATH)
+
+            print("YOLO model loaded successfully.")
+
+        except Exception as error:
+            load_exception = error
+            raise RuntimeError(
+                f"Unable to load model: {error}"
+            )
+
+    return model
 
 
 def detect_ringworm(image_path):
-    """Run lightweight YOLO detection on CPU."""
+    """Run YOLO detection with low-memory settings."""
 
-    if model is None:
-        raise RuntimeError(
-            f"Unable to load model: {load_exception}"
+    detector = get_model()
+
+    try:
+        # Smaller image size = significantly lower memory usage
+        results = detector.predict(
+            source=image_path,
+            imgsz=320,
+            conf=0.25,
+            max_det=5,
+            device="cpu",
+            verbose=False,
+            stream=True
         )
 
-    # Smaller image size = significantly lower memory usage
-    results = model.predict(
-        source=image_path,
-        imgsz=320,
-        conf=0.25,
-        max_det=1,
-        device="cpu",
-        verbose=False,
-        half=False
-    )
+        result = next(iter(results))
 
-    if not results or len(results[0].boxes) == 0:
+        if len(result.boxes) == 0:
+            output_path = save_default_image(image_path)
+
+            gc.collect()
+
+            return {
+                "detected": False,
+                "confidence": 0.0,
+                "result_image": os.path.basename(output_path),
+                "label": "No Ringworm Detected",
+            }
+
+        best_box = max(
+            result.boxes,
+            key=lambda box: float(box.conf[0])
+        )
+
+        confidence = float(best_box.conf[0])
+        label = "Ringworm"
+
+        output_path = save_annotated_image(
+            image_path,
+            result,
+            confidence,
+            label
+        )
+
+        gc.collect()
+
         return {
-            "detected": False,
-            "confidence": 0.0,
-            "result_image": os.path.basename(
-                save_default_image(image_path)
-            ),
-            "label": "No Ringworm Detected",
+            "detected": True,
+            "confidence": round(confidence, 2),
+            "result_image": os.path.basename(output_path),
+            "label": label,
         }
 
-    best_box = max(
-        results[0].boxes,
-        key=lambda box: float(box.conf[0])
-    )
-
-    confidence = float(best_box.conf[0])
-    label = "Ringworm"
-
-    annotated_image_path = save_annotated_image(
-        image_path,
-        results[0],
-        confidence,
-        label
-    )
-
-    return {
-        "detected": True,
-        "confidence": round(confidence, 2),
-        "result_image": os.path.basename(
-            annotated_image_path
-        ),
-        "label": label,
-    }
+    except Exception as error:
+        gc.collect()
+        raise RuntimeError(f"Inference failed: {error}")
 
 
 def save_default_image(image_path):
-    """Copy original image to results folder."""
+    """Save original image when no ringworm is detected."""
 
-    target_name = os.path.basename(image_path)
+    target_name = f"result_{os.path.basename(image_path)}"
     target_path = os.path.join(
         RESULTS_DIR,
         target_name
@@ -113,12 +136,15 @@ def save_annotated_image(
         )
 
     for box in result.boxes:
+
         x1, y1, x2, y2 = map(
             int,
             box.xyxy[0].tolist()
         )
 
-        text = f"{label} {int(confidence * 100)}%"
+        box_confidence = float(box.conf[0])
+
+        text = f"{label} {int(box_confidence * 100)}%"
 
         color = (255, 0, 0)
         thickness = 2
@@ -136,7 +162,9 @@ def save_annotated_image(
             text,
             (
                 x1,
-                y1 - 10 if y1 - 10 > 20 else y1 + 20
+                y1 - 10
+                if y1 - 10 > 20
+                else y1 + 20
             ),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.8,
@@ -145,9 +173,7 @@ def save_annotated_image(
             cv2.LINE_AA
         )
 
-    target_name = (
-        f"result_{os.path.basename(image_path)}"
-    )
+    target_name = f"result_{os.path.basename(image_path)}"
 
     target_path = os.path.join(
         RESULTS_DIR,
