@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ringworm Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+    <div class="container">
+        <header class="hero-card">
+            <h1>Ringworm Detection System using YOLOv11</h1>
+            <p>Upload a skin image to detect ringworm and view the confidence score with bounding boxes.</p>
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="upload-card">
+            <form id="uploadForm" action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data">
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" name="image" id="imageInput" accept="image/*" />
+                    <div class="drop-zone-text">
+                        <p>Drag & drop an image here, or click to upload.</p>
+                        <span class="small-text">PNG, JPG, JPEG, GIF</span>
+                    </div>
+                    <img id="previewImage" class="preview-image" src="#" alt="Image preview" hidden />
+                </div>
+                <button type="submit" class="button">Detect Ringworm</button>
+                <div class="loading" id="loadingSpinner" hidden>
+                    <div class="spinner"></div>
+                    <span>Detecting, please wait...</span>
+                </div>
+            </form>
+        </section>
+
+        {% if result_image %}
+            <section class="results-card">
+                <div class="result-block">
+                    <h2>Original Image</h2>
+                    <img src="{{ original_image }}" alt="Original upload" />
+                </div>
+                <div class="result-block">
+                    <h2>Detected Image</h2>
+                    <img src="{{ result_image }}" alt="Result image" />
+                </div>
+                <div class="result-summary">
+                    <p><strong>Status:</strong> {{ label }}</p>
+                    <p><strong>Confidence:</strong> {{ (confidence * 100)|round(1) }}%</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ (confidence * 100)|round(1) }}%"></div>
+                    </div>
+                    <p><strong>Detection time:</strong> {{ time_seconds }} seconds</p>
+                    <a href="{{ result_image }}" download class="button secondary">Download Result Image</a>
+                </div>
+            </section>
+        {% endif %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

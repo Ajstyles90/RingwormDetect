@@ -1,0 +1,67 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+
+# Python virtual environments
+venv/
+.venv/
+env/
+
+# Python packages
+*.egg-info/
+
+# Python
+.Python
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Coverage
+htmlcov/
+
+# Environment variables
+.env
+.env.local
+.env*.local
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor temporary files
+*.swp
+
+# Node.js
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Large datasets / training files
+dataset/
+datasets/
+runs/
+training/
+
+# Compressed files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Machine learning model files
+*.pt
+*.pth
+*.onnx
+*.weights
+# PyInstaller generated files
+build/
+dist/
+installer/
+*.spec
