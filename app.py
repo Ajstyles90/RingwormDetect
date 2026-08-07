@@ -2,7 +2,10 @@ import os
 import time
 import threading
 
-import webview
+try:
+    import webview
+except ImportError:
+    webview = None
 from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 
@@ -113,7 +116,7 @@ def predict():
 
 
 def start_flask():
-    """Start Flask in the background."""
+    """Start Flask for the desktop application."""
     app.run(
         host="127.0.0.1",
         port=5000,
@@ -124,21 +127,29 @@ def start_flask():
 
 if __name__ == "__main__":
 
-    # Start Flask in background
-    flask_thread = threading.Thread(
-        target=start_flask,
-        daemon=True
-    )
+    if webview is not None:
+        # Desktop application
+        flask_thread = threading.Thread(
+            target=start_flask,
+            daemon=True
+        )
 
-    flask_thread.start()
+        flask_thread.start()
 
-    # Open Flask application inside desktop window
-    webview.create_window(
-        "Ringworm Detection System",
-        "http://127.0.0.1:5000",
-        width=1200,
-        height=800,
-        resizable=True
-    )
+        webview.create_window(
+            "Ringworm Detection System",
+            "http://127.0.0.1:5000",
+            width=1200,
+            height=800,
+            resizable=True
+        )
 
-    webview.start()
+        webview.start()
+
+    else:
+        # Render / web server
+        app.run(
+            host="0.0.0.0",
+            port=int(os.environ.get("PORT", 5000)),
+            debug=False
+        )
