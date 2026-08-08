@@ -6,20 +6,22 @@ try:
     import webview
 except ImportError:
     webview = None
-from flask import Flask, render_template, request, redirect, url_for, flash
+
+from flask import Flask, render_template, request, jsonify, url_for
 from werkzeug.utils import secure_filename
 
 from utils.detector import detect_ringworm
 
 
 # Allowed image extensions
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 
 
 # Create Flask app
 app = Flask(__name__)
 
-app.secret_key = "ringworm-secret-key"
+# Use an environment-provided secret key in production; fall back for local dev.
+app.secret_key = os.environ.get("SECRET_KEY", "ringworm-dev-secret-key")
 
 app.config["UPLOAD_FOLDER"] = os.path.join(
     app.root_path, "static", "uploads"
@@ -41,78 +43,78 @@ def allowed_file(filename):
     """Check whether the uploaded file has a valid extension."""
     return (
         "." in filename
-        and filename.rsplit(".", 1)[1].lower()
-        in ALLOWED_EXTENSIONS
+        and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
     )
 
 
 @app.route("/", methods=["GET"])
 def home():
     """Render the home page."""
-    return render_template("index.html")
+    return render_template("home.html")
 
 
-@app.route("/predict", methods=["POST"])
-def predict():
-    """Handle image upload, run detection, and display results."""
+@app.route("/detection", methods=["GET"])
+def detection():
+    """Render the detection page."""
+    return render_template("detection.html")
 
+
+@app.route("/about", methods=["GET"])
+def about():
+    """Render the about page."""
+    return render_template("about.html")
+
+
+@app.route("/api/predict", methods=["POST"])
+def api_predict():
+    """Handle image upload, run detection, and return JSON results."""
     if "image" not in request.files:
-        flash("No image file part in the request.")
-        return redirect(url_for("home"))
+        return jsonify(
+            {"success": False, "error": "No image was provided. Please choose an image to analyze."}
+        ), 400
 
     file = request.files["image"]
 
     if file.filename == "":
-        flash("Please choose an image before submitting.")
-        return redirect(url_for("home"))
+        return jsonify(
+            {"success": False, "error": "Please choose an image before submitting."}
+        ), 400
 
     if not allowed_file(file.filename):
-        flash(
-            "Unsupported file type. Please upload PNG, JPG, JPEG or GIF."
-        )
-        return redirect(url_for("home"))
+        return jsonify(
+            {
+                "success": False,
+                "error": "Unsupported file type. Please upload a PNG, JPG, JPEG, WEBP or GIF image.",
+            }
+        ), 400
 
     filename = secure_filename(file.filename)
-
-    upload_path = os.path.join(
-        app.config["UPLOAD_FOLDER"],
-        filename
-    )
-
+    upload_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     file.save(upload_path)
 
-    # Run detection
     start_time = time.time()
 
     try:
         result = detect_ringworm(upload_path)
-
+    except FileNotFoundError as error:
+        return jsonify(
+            {"success": False, "error": "The detection model is currently unavailable. Please try again later."}
+        ), 503
     except Exception as error:
-        flash(f"Model error: {error}")
-        return redirect(url_for("home"))
+        app.logger.error("Detection failed: %s", error)
+        return jsonify(
+            {"success": False, "error": "Unable to analyze image. Something went wrong while processing the image. Please try again."}
+        ), 500
 
     end_time = time.time()
 
-    result["time_seconds"] = round(
-        end_time - start_time,
-        2
+    result["time_seconds"] = round(end_time - start_time, 2)
+    result["success"] = True
+    result["result_image_url"] = url_for(
+        "static", filename=f"results/{result['result_image']}"
     )
 
-    return render_template(
-        "index.html",
-        original_image=url_for(
-            "static",
-            filename=f"uploads/{filename}"
-        ),
-        result_image=url_for(
-            "static",
-            filename=f"results/{result['result_image']}"
-        ),
-        detected=result["detected"],
-        label=result["label"],
-        confidence=result["confidence"],
-        time_seconds=result["time_seconds"],
-    )
+    return jsonify(result)
 
 
 def start_flask():
@@ -121,7 +123,7 @@ def start_flask():
         host="127.0.0.1",
         port=5000,
         debug=False,
-        use_reloader=False
+        use_reloader=False,
     )
 
 
@@ -131,7 +133,7 @@ if __name__ == "__main__":
 
         flask_thread = threading.Thread(
             target=start_flask,
-            daemon=True
+            daemon=True,
         )
 
         flask_thread.start()
@@ -141,15 +143,16 @@ if __name__ == "__main__":
             "http://127.0.0.1:5000",
             width=1200,
             height=800,
-            resizable=True
+            resizable=True,
         )
 
         webview.start()
 
     else:
 
+        # Bind to 0.0.0.0 and use PORT for Render / cloud hosting.
         app.run(
             host="0.0.0.0",
             port=int(os.environ.get("PORT", 5000)),
-            debug=False
+            debug=False,
         )

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}About — Ringworm Detection System{% endblock %}
+
+{% block content %}
+<section class="section about-intro">
+    <div class="container">
+        <div class="page-heading">
+            <p class="hero-eyebrow">About the System</p>
+            <h1 class="page-title">About</h1>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container about-grid">
+        <div class="card">
+            <h2 class="card-title">What is this system?</h2>
+            <p>
+                This system is an AI-assisted ringworm detection application developed
+                as a Computer Science project. It uses a trained YOLOv11s model to
+                analyze skin images for visual indications of ringworm and presents
+                the results with confidence scores and bounding boxes.
+            </p>
+            <p>
+                It is intended as an educational and research tool to demonstrate object
+                detection applied to a real-world dermatological concern.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">How does it work?</h2>
+            <ol class="how-list">
+                <li><span>1</span> User uploads an image</li>
+                <li><span>2</span> Image is sent for processing</li>
+                <li><span>3</span> YOLOv11s analyzes the image</li>
+                <li><span>4</span> Detection results are returned</li>
+                <li><span>5</span> Results are presented visually</li>
+            </ol>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Technologies</h2>
+        <p class="section-subtitle">Tools and libraries actually used in this project.</p>
+
+        <div class="tech-grid">
+            <div class="tech-item">
+                <strong>YOLOv11s</strong>
+                <span>Detection model</span>
+            </div>
+            <div class="tech-item">
+                <strong>Python</strong>
+                <span>Backend language</span>
+            </div>
+            <div class="tech-item">
+                <strong>OpenCV</strong>
+                <span>Image processing</span>
+            </div>
+            <div class="tech-item">
+                <strong>NumPy</strong>
+                <span>Numerical computing</span>
+            </div>
+            <div class="tech-item">
+                <strong>ONNX Runtime</strong>
+                <span>Inference engine</span>
+            </div>
+            <div class="tech-item">
+                <strong>Flask</strong>
+                <span>Web framework</span>
+            </div>
+            <div class="tech-item">
+                <strong>HTML / CSS / JS</strong>
+                <span>Frontend</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="card developer-card">
+            <div class="developer-avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <div class="developer-info">
+                <h2 class="card-title">Developed By</h2>
+                <p class="developer-name">Al John T. Aguilar</p>
+                <p class="developer-role">Bachelor of Science in Computer Science</p>
+                <p class="developer-school">Catanduanes State University</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section disclaimer-section">
+    <div class="container">
+        <div class="disclaimer">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 16v-4M12 8h.01"></path>
+            </svg>
+            <p>
+                This system is an AI-assisted research and detection tool. Results are
+                not a medical diagnosis and should not replace evaluation by a qualified
+                healthcare professional.
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

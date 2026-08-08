@@ -64,3 +64,15 @@ build/
 dist/
 installer/
 *.spec
+
+# Generated uploads and results
+static/uploads/*.jpg
+static/uploads/*.jpeg
+static/uploads/*.png
+static/uploads/*.gif
+static/uploads/*.webp
+static/results/*.jpg
+static/results/*.jpeg
+static/results/*.png
+static/results/*.gif
+static/results/*.webp

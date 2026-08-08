@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Ringworm Detection System — an AI-assisted detection research tool using a trained YOLOv11s model. Developed by Al John T. Aguilar." />
+    <title>{% block title %}Ringworm Detection System{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    <header class="site-header">
+        <nav class="nav" aria-label="Primary navigation">
+            <a href="{{ url_for('home') }}" class="brand" aria-label="Ringworm Detection System home">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"></path>
+                    </svg>
+                </span>
+                <span class="brand-text">
+                    <strong>Ringworm Detection</strong>
+                    <small>AI-Assisted System</small>
+                </span>
+            </a>
+
+            <button
+                class="nav-toggle"
+                id="navToggle"
+                aria-label="Toggle navigation menu"
+                aria-expanded="false"
+                aria-controls="navMenu">
+                <span></span><span></span><span></span>
+            </button>
+
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="{{ url_for('home') }}" {% if active_page == 'home' %}class="active" aria-current="page"{% endif %}>Home</a></li>
+                <li><a href="{{ url_for('detection') }}" {% if active_page == 'detection' %}class="active" aria-current="page"{% endif %}>Detection</a></li>
+                <li><a href="{{ url_for('about') }}" {% if active_page == 'about' %}class="active" aria-current="page"{% endif %}>About</a></li>
+                <li class="nav-cta">
+                    <a href="{{ url_for('detection') }}" class="btn btn-primary btn-sm">Start Detection</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="container">
+                    {% for message in messages %}
+                        <div class="alert alert-error" role="alert">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>Ringworm Detection System</strong>
+                <p>AI-assisted detection research tool powered by YOLOv11s.</p>
+            </div>
+            <div class="footer-dev">
+                <span>Developed by</span>
+                <strong>Al John T. Aguilar</strong>
+                <small>Catanduanes State University</small>
+            </div>
+        </div>
+        <div class="container footer-disclaimer">
+            <p>This system is an AI-assisted research and detection tool. Results are not a medical diagnosis and should not replace evaluation by a qualified healthcare professional.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

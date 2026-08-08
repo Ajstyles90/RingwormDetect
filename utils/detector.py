@@ -248,6 +248,8 @@ def detect_ringworm(image_path):
                 "confidence": 0.0,
                 "result_image": os.path.basename(output_path),
                 "label": "No Ringworm Detected",
+                "detection_count": 0,
+                "boxes": [],
             }
 
         best = detections[0]
@@ -258,7 +260,9 @@ def detect_ringworm(image_path):
             "detected": True,
             "confidence": round(best["confidence"], 2),
             "result_image": os.path.basename(output_path),
-            "label": "Ringworm",
+            "label": "Ringworm Detected",
+            "detection_count": len(detections),
+            "boxes": detections,
         }
 
     except Exception as error:
