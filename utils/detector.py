@@ -49,13 +49,13 @@ def detect_ringworm(image_path):
         print(f"Processing image: {image_path}")
 
         results = detector.predict(
-            source=image_path,
-            imgsz=320,
-            conf=0.25,
-            max_det=5,
-            device="cpu",
-            verbose=False
-        )
+    source=image_path,
+    imgsz=160,
+    conf=0.25,
+    max_det=3,
+    device="cpu",
+    verbose=False
+)
 
         if not results:
             raise RuntimeError(
