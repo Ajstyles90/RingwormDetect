@@ -1,14 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Ringworm Detection System — AI-Assisted Detection{% endblock %}
+{% block title %}Ringworm Detection Using The YOLOv11s Architecture{% endblock %}
 
 {% block content %}
 <section class="hero">
     <div class="container hero-inner">
         <p class="hero-eyebrow">YOLOv11s-based AI Detection</p>
-        <h1 class="hero-title">AI-Powered Ringworm Detection</h1>
+        <h1 class="hero-title">Ringworm Detection Using The YOLOv11s Architecture</h1>
         <p class="hero-subtitle">
             An AI-assisted detection system that uses a trained YOLOv11s model
             to analyze skin images for visual indications of ringworm.
+            Made by Al John Aguilar.
         </p>
         <div class="hero-actions">
             <a href="{{ url_for('detection') }}" class="btn btn-primary btn-lg">Start Detection</a>

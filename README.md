@@ -1,8 +1,8 @@
-# Ringworm Detection System
+# Ringworm Detection Using The YOLOv11s Architecture
 
 An AI-assisted ringworm detection web application developed as a Computer Science project. It uses a trained **YOLOv11s** model (exported to ONNX) to analyze skin images for visual indications of ringworm.
 
-**Developed by Al John T. Aguilar** · Catanduanes State University
+**Made by Al John Aguilar** · Catanduanes State University
 
 > This is an AI-assisted research and detection tool. Results are not a medical diagnosis and should not replace evaluation by a qualified healthcare professional.
 
