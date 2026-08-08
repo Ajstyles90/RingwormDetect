@@ -58,7 +58,6 @@ training/
 # Machine learning model files
 *.pt
 *.pth
-*.onnx
 *.weights
 # PyInstaller generated files
 build/
