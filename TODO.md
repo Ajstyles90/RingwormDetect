@@ -38,5 +38,5 @@
 - [x] Review git status (exclude .env/uploads/results)
 - [x] Untracked unused best.pt + generated images
 - [x] Commit (8694ae2)
-- [ ] Commit overlay-fix changes
-- [ ] Push to origin/main
+- [x] Commit overlay-fix changes (5783c13)
+- [x] Push to origin/main
