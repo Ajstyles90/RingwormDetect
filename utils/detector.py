@@ -33,7 +33,7 @@ def get_model():
                 f"Model not found: {MODEL_PATH}"
             )
 
-        model = YOLO(MODEL_PATH)
+        model = YOLO(MODEL_PATH, task="detect")
 
         print("ONNX model loaded successfully.")
 
