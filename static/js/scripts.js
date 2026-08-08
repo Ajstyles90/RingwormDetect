@@ -32,7 +32,6 @@
     // ---------- State ----------
     let selectedFile = null;
     let selectedObjectURL = null;
-    let lastResult = null;
     let isProcessing = false;
 
     const ALLOWED = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"];
@@ -58,7 +57,6 @@
     const statusBadge = document.getElementById("statusBadge");
     const resultOriginal = document.getElementById("resultOriginal");
     const resultAnnotated = document.getElementById("resultAnnotated");
-    const boxOverlay = document.getElementById("boxOverlay");
     const statStatus = document.getElementById("statStatus");
     const statConfidence = document.getElementById("statConfidence");
     const statCount = document.getElementById("statCount");
@@ -104,8 +102,6 @@
 
     function clearResult() {
         if (resultCard) resultCard.hidden = true;
-        if (boxOverlay) boxOverlay.innerHTML = "";
-        lastResult = null;
     }
 
     function resetInterface() {
@@ -115,7 +111,6 @@
         }
         selectedFile = null;
         isProcessing = false;
-        lastResult = null;
 
         hideMessage();
         hideError();
@@ -235,46 +230,8 @@
         });
     }
 
-    // ---------- Bounding box overlay ----------
-    function drawBoxes() {
-        if (!boxOverlay || !resultOriginal) return;
-        boxOverlay.innerHTML = "";
-        if (!lastResult || !lastResult.boxes || lastResult.boxes.length === 0) return;
-
-        const img = resultOriginal;
-        if (!img.complete || img.naturalWidth === 0) return;
-
-        const scaleX = img.clientWidth / img.naturalWidth;
-        const scaleY = img.clientHeight / img.naturalHeight;
-
-        lastResult.boxes.forEach(function (box) {
-            const div = document.createElement("div");
-            div.className = "box";
-            div.style.left = box.x1 * scaleX + "px";
-            div.style.top = box.y1 * scaleY + "px";
-            div.style.width = (box.x2 - box.x1) * scaleX + "px";
-            div.style.height = (box.y2 - box.y1) * scaleY + "px";
-
-            const label = document.createElement("span");
-            label.className = "box-label";
-            label.textContent = "Ringworm " + Math.round(box.confidence * 100) + "%";
-            div.appendChild(label);
-
-            boxOverlay.appendChild(div);
-        });
-    }
-
-    if (resultOriginal) {
-        resultOriginal.addEventListener("load", function () {
-            if (resultCard && !resultCard.hidden) {
-                drawBoxes();
-            }
-        });
-    }
-
     // ---------- Render result ----------
     function renderResult(data) {
-        lastResult = data;
         const detected = data.detected === true;
         const confidence = Math.round((data.confidence || 0) * 100);
         const count = data.detection_count || (data.boxes ? data.boxes.length : 0);
@@ -312,7 +269,6 @@
         }
 
         if (resultCard) resultCard.hidden = false;
-        drawBoxes();
         if (resultCard) resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 

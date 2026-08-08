@@ -13,10 +13,12 @@
 - [x] home.html (hero + workflow)
 - [x] detection.html (premium upload + AJAX + loading + result + Analyze Again)
 - [x] about.html (About / How it works / Technologies / Developer / Disclaimer)
+- [x] Fix: Original Image shows clean upload (no box overlay); only Detection Result shows boxes
 
 ## Frontend
 - [x] styles.css redesign (black/white/neutral, responsive, animations, a11y)
-- [x] scripts.js rewrite (upload, preview, AJAX, loading, result overlay, reset, errors)
+- [x] Remove now-unused box overlay CSS + JS (boxOverlay, drawBoxes, lastResult)
+- [x] scripts.js rewrite (upload, preview, AJAX, loading, result, reset, errors)
 
 ## Config / Docs
 - [x] .env.example
@@ -29,10 +31,12 @@
 - [x] Verified /api/predict with real image (detected=True, conf 0.61, 3 boxes)
 - [x] Verified error handling (no file -> 400; bad ext -> 400)
 - [x] Verified gunicorn import (22.0.0)
-- [x] Final smoke test: 12/12 PASS
+- [x] node --check scripts.js passes (syntax valid)
+- [x] Final smoke test after overlay removal: routes 200, JS 200, CSS 200, predict 200/detected/3
 
 ## Git
 - [x] Review git status (exclude .env/uploads/results)
 - [x] Untracked unused best.pt + generated images
-- [ ] Commit
+- [x] Commit (8694ae2)
+- [ ] Commit overlay-fix changes
 - [ ] Push to origin/main
